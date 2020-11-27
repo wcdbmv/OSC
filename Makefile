@@ -12,6 +12,10 @@ KERNEL_DRIVERS_UBA_DIR = $(KERNEL_DIR)/kernel/drivers/$(UBA_MODULE_NAME)
 GRUB_CONFIG = /etc/default/grub
 GRUB_CONFIG_BACKUP = $(GRUB_CONFIG).backup
 
+.PHONY: all default install modules modules_install help clean \
+	enable_at_boot disable_at_boot \
+	boot_in_console_mode boot_in_gui_mode
+
 
 all default: modules
 install: modules_install
@@ -21,7 +25,7 @@ modules modules_install help clean:
 	make -C $(KERNEL_BUILD_DIR) M=$(shell pwd) $@
 
 
-__insmod: modules $(KERNEL_DRIVERS_UBA_DIR)
+enable_at_boot: modules $(KERNEL_DRIVERS_UBA_DIR)
 ifneq ($(shell grep $(UBA_MODULE_NAME) /etc/modules),)
 	$(error module already loaded)
 endif
@@ -31,7 +35,7 @@ endif
 	depmod
 
 
-__rmmod:
+disable_at_boot:
 ifeq ($(shell grep $(UBA_MODULE_NAME) /etc/modules),)
 	$(error module already unloaded)
 endif
@@ -46,7 +50,7 @@ endif
 	depmod
 
 
-__boot_console: $(GRUB_CONFIG_BACKUP)
+boot_in_console_mode: $(GRUB_CONFIG_BACKUP)
 	sed --in-place 's/^GRUB_CMDLINE_LINUX_DEFAULT=\(.*\)$$/#GRUB_CMDLINE_LINUX_DEFAULT=\1/' $(GRUB_CONFIG)
 	sed --in-place 's/^GRUB_CMDLINE_LINUX=.*$$/GRUB_CMDLINE_LINUX=text/' $(GRUB_CONFIG)
 	sed --in-place 's/^#GRUB_TERMINAL=.*$$/GRUB_TERMINAL=console/' $(GRUB_CONFIG)
@@ -54,7 +58,7 @@ __boot_console: $(GRUB_CONFIG_BACKUP)
 	systemctl set-default multi-user.target
 
 
-__boot_gui:
+boot_in_gui_mode:
 	mv $(GRUB_CONFIG_BACKUP) $(GRUB_CONFIG)
 	update-grub
 	systemctl set-default graphical.target
