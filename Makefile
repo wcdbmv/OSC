@@ -12,9 +12,16 @@ KERNEL_DRIVERS_UBA_DIR = $(KERNEL_DIR)/kernel/drivers/$(UBA_MODULE_NAME)
 GRUB_CONFIG = /etc/default/grub
 GRUB_CONFIG_BACKUP = $(GRUB_CONFIG).backup
 
+RSYSLOG_CONFIG = /etc/rsyslog.d/10-usb-boot-authentication.conf
+
+
 .PHONY: all default install modules modules_install help clean \
-	enable_at_boot disable_at_boot \
-	boot_in_console_mode boot_in_gui_mode
+	enable_at_boot \
+	disable_at_boot \
+	boot_in_console_mode \
+	boot_in_gui_mode \
+	enable_printing_kernel_journal_on_tty \
+	disable_printing_kernel_journal_on_tty
 
 
 all default: modules
@@ -62,6 +69,14 @@ boot_in_gui_mode:
 	mv $(GRUB_CONFIG_BACKUP) $(GRUB_CONFIG)
 	update-grub
 	systemctl set-default graphical.target
+
+
+enable_printing_kernel_journal_on_tty:
+	echo 'kern.* /dev/tty1' > $(RSYSLOG_CONFIG)
+
+
+disable_printing_kernel_journal_on_tty:
+	rm -f $(RSYSLOG_CONFIG)
 
 
 $(KERNEL_DRIVERS_UBA_DIR):
