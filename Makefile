@@ -21,7 +21,9 @@ RSYSLOG_CONFIG = /etc/rsyslog.d/10-usb-boot-authentication.conf
 	boot_in_console_mode \
 	boot_in_gui_mode \
 	enable_printing_kernel_journal_on_tty \
-	disable_printing_kernel_journal_on_tty
+	disable_printing_kernel_journal_on_tty \
+	enable_rc_local \
+	disable_rc_local
 
 
 all default: modules
@@ -77,6 +79,17 @@ enable_printing_kernel_journal_on_tty:
 
 disable_printing_kernel_journal_on_tty:
 	rm -f $(RSYSLOG_CONFIG)
+
+
+enable_rc_local: config/rc-local.service
+	echo -e '#!/bin/bash\n\nsleep 31' > /etc/rc.local
+	cp $< /etc/systemd/system/
+	systemctl enable rc-local
+
+
+disable_rc_local:
+	rm -f /etc/rc.local /etc/systemd/system/rc-local.service
+	systemctl disable rc-local
 
 
 $(KERNEL_DRIVERS_UBA_DIR):
