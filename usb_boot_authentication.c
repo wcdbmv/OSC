@@ -62,11 +62,21 @@ static int uba_agetty_stop_thread(void * data)
 	return 0;
 }
 
+#define UBA_VENDOR_ID  0x0781
+#define UBA_PRODUCT_ID 0x5591
+#define UBA_SERIAL "4C530001301105102492"
+
 static int uba_probe(struct usb_interface *interface, const struct usb_device_id *id)
 {
+	struct usb_device *dev;
 	struct task_struct *task;
 
-	printk(KERN_NOTICE "%s: USB flash drive (0x%04X:0x%04X) plugged\n", UBA_MODULE_NAME, id->idVendor, id->idProduct);
+	dev = interface_to_usbdev(interface);
+
+	printk(KERN_NOTICE "%s: USB flash drive (0x%04X:0x%04X) [Serial=%s] plugged\n", UBA_MODULE_NAME, id->idVendor, id->idProduct, dev->serial);
+	if (strcmp(dev->serial, UBA_SERIAL)) {
+		printk(KERN_NOTICE "%s: The usb serial does not match\n", UBA_MODULE_NAME);
+	}
 
 	kthread_stop(agetty_stop_thread);
 
@@ -83,9 +93,6 @@ static void uba_disconnect(struct usb_interface *interface)
 {
 	printk(KERN_NOTICE "%s: USB flash drive unplugged\n", UBA_MODULE_NAME);
 }
-
-#define UBA_VENDOR_ID  0x0781
-#define UBA_PRODUCT_ID 0x5591
 
 static struct usb_device_id uba_table[] = {
 	{ USB_DEVICE(UBA_VENDOR_ID, UBA_PRODUCT_ID) },
