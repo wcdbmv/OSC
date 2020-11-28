@@ -74,7 +74,7 @@ boot_in_gui_mode:
 
 
 enable_printing_kernel_journal_on_tty:
-	echo 'kern.* /dev/tty1' > $(RSYSLOG_CONFIG)
+	echo 'kern.notice,kern.warning /dev/tty1' > $(RSYSLOG_CONFIG)
 
 
 disable_printing_kernel_journal_on_tty:
