@@ -21,11 +21,11 @@ static int uba_timer_thread(void *data)
 	int i;
 
 	for (i = 30; !kthread_should_stop(); --i) {
-		printk(KERN_WARNING "%s: %02d secs to shutdown\n", UBA_MODULE_NAME, i);
+		printk(KERN_NOTICE "%s: %02d secs to shutdown\n", UBA_MODULE_NAME, i);
 		printk(KERN_NOTICE "%s: plug in usb key to start up\n", UBA_MODULE_NAME);
 
 		ssleep(1);
-		if (i < 0) {
+		if (i <= 0) {
 			kernel_power_off();
 		}
 	}

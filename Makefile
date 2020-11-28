@@ -74,15 +74,17 @@ boot_in_gui_mode:
 
 
 enable_printing_kernel_journal_on_tty:
-	echo 'kern.notice,kern.warning /dev/tty1' > $(RSYSLOG_CONFIG)
+	echo 'kern.notice /dev/tty1' > $(RSYSLOG_CONFIG)
 
 
 disable_printing_kernel_journal_on_tty:
 	rm -f $(RSYSLOG_CONFIG)
 
 
+# does not need
 enable_rc_local: config/rc-local.service
 	echo -e '#!/bin/bash\n\nsleep 31' > /etc/rc.local
+	chmod +x /etc/rc.local
 	cp $< /etc/systemd/system/
 	systemctl enable rc-local
 
