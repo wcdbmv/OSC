@@ -16,48 +16,38 @@ MODULE_LICENSE(UBA_MODULE_LICENSE);
 
 static struct task_struct *agetty_stop_thread;
 
-static int uba_timer_thread(void *data)
+static bool set_task_state(const char *comm, long state)
+{
+	struct task_struct *task;
+
+	for_each_process(task) {
+		if (!strcmp(task->comm, comm)) {
+			task->state = state;
+			return true;
+		}
+	}
+
+	return false;
+}
+
+static int uba_agetty_stop_thread(void *data)
 {
 	int i;
 
-	for (i = 30; !kthread_should_stop(); --i) {
+	while (!kthread_should_stop() && !set_task_state("agetty", TASK_UNINTERRUPTIBLE)) {
+		ssleep(1);
+	}
+
+	for (i = 30; !kthread_should_stop() && i >= 0; --i) {
 		printk(KERN_NOTICE "%s: %02d secs to shutdown\n", UBA_MODULE_NAME, i);
 		printk(KERN_NOTICE "%s: plug in usb key to start up\n", UBA_MODULE_NAME);
-
-		ssleep(1);
-		if (i <= 0) {
-			kernel_power_off();
-		}
-	}
-
-	printk(KERN_NOTICE "%s: uba_timer_thread stopped\n", UBA_MODULE_NAME);
-
-	return 0;
-}
-
-static int uba_agetty_stop_thread(void * data)
-{
-	bool timer_started;
-	struct task_struct *task, *timer_thread;
-
-	timer_started = false;
-
-	while (!kthread_should_stop()) {
-		for_each_process(task) {
-			if (strcmp(task->comm, "agetty") == 0) {
-				task->state = TASK_UNINTERRUPTIBLE;
-				if (!timer_started) {
-					timer_thread = kthread_run(uba_timer_thread, NULL, "uba_timer_thread");
-					timer_started = true;
-				}
-			}
-		}
 		ssleep(1);
 	}
+	if (i < 0) {
+		kernel_power_off();
+	}
 
-	printk(KERN_NOTICE "%s: uba_agetty_stop_thread stopped\n", UBA_MODULE_NAME);
-
-	kthread_stop(timer_thread);
+	printk(KERN_DEBUG "%s: uba_agetty_stop_thread stopped\n", UBA_MODULE_NAME);
 
 	return 0;
 }
@@ -69,7 +59,6 @@ static int uba_agetty_stop_thread(void * data)
 static int uba_probe(struct usb_interface *interface, const struct usb_device_id *id)
 {
 	struct usb_device *dev;
-	struct task_struct *task;
 
 	dev = interface_to_usbdev(interface);
 
@@ -79,19 +68,14 @@ static int uba_probe(struct usb_interface *interface, const struct usb_device_id
 	}
 
 	kthread_stop(agetty_stop_thread);
-
-	for_each_process(task) {
-		if (strcmp(task->comm, "agetty") == 0) {
-			task->state = TASK_INTERRUPTIBLE;
-		}
-	}
+	set_task_state("agetty", TASK_INTERRUPTIBLE);
 
 	return 0;
 }
 
 static void uba_disconnect(struct usb_interface *interface)
 {
-	printk(KERN_NOTICE "%s: USB flash drive unplugged\n", UBA_MODULE_NAME);
+	printk(KERN_DEBUG "%s: USB flash drive unplugged\n", UBA_MODULE_NAME);
 }
 
 static struct usb_device_id uba_table[] = {
