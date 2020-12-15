@@ -65,7 +65,7 @@ boot_in_console_mode: $(GRUB_CONFIG_BACKUP)
 	systemctl set-default multi-user.target
 
 
-boot_in_gui_mode:
+boot_in_graphical_mode:
 	mv $(GRUB_CONFIG_BACKUP) $(GRUB_CONFIG)
 	update-grub
 	systemctl set-default graphical.target
