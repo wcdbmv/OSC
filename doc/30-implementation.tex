@@ -65,4 +65,22 @@
 	\item средство автоматизации сборки — make.
 \end{itemize}
 
+\section{Разработанные функции}
+
+\section{Действия по установке ПО}
+
+\begin{lstlisting}[gobble=8, language=Bash]
+	$ make
+	$ sudo make enable_at_boot
+	$ sudo make boot_in_console_mode
+	$ sudo make enable_printing_kernel_journal_on_tty
+\end{lstlisting}
+
+\begin{lstlisting}[gobble=8, language=Bash]
+	$ sudo make disable_printing_kernel_journal_on_tty
+	$ sudo make boot_in_graphical_mode
+	$ sudo make disable_at_boot
+	$ make clean
+\end{lstlisting}
+
 \section*{Вывод}

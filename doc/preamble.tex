@@ -58,7 +58,21 @@
 	tabsize=8
 }
 
+\lstdefinelanguage{Bash}{
+	keywords={make},
+	keywordstyle=\color{blue}\bfseries,
+	ndkeywords={sudo},
+	ndkeywordstyle=\color{purple}\bfseries,
+	identifierstyle=\color{black},
+	sensitive=false,
+	comment=[l]{\#}
+}
+
 \newcommand{\code}[1]{\texttt{#1}}
+
+\makeatletter
+\newcommand{\verbatimfont}[1]{\renewcommand{\verbatim@font}{\ttfamily#1}}
+\verbatimfont{\small}
 %% end code
 
 \usepackage{icomma}
