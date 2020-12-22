@@ -19,7 +19,7 @@ RSYSLOG_CONFIG = /etc/rsyslog.d/10-usb-boot-authentication.conf
 	enable_at_boot \
 	disable_at_boot \
 	boot_in_console_mode \
-	boot_in_gui_mode \
+	boot_in_graphical_mode \
 	enable_printing_kernel_journal_on_tty \
 	disable_printing_kernel_journal_on_tty
 
