@@ -64,8 +64,8 @@
 	ndkeywords={sudo},
 	ndkeywordstyle=\color{purple}\bfseries,
 	identifierstyle=\color{black},
-	sensitive=false,
-	comment=[l]{\#}
+	sensitive=false%,
+%	comment=[l]{\#}
 }
 
 \newcommand{\code}[1]{\texttt{#1}}
@@ -80,3 +80,11 @@
 \usepackage{pgfplots}
 \usetikzlibrary{datavisualization}
 \usetikzlibrary{datavisualization.formats.functions}
+
+\newcommand{\img}[3] {
+	\begin{figure}[H]
+		\center{\includegraphics[#1]{inc/img/#2}}
+		\caption{#3}
+		\label{img:#2}
+	\end{figure}
+}
